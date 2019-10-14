@@ -15,3 +15,5 @@ ifneq ($(filter full_oppo6779, $(shell echo $(TARGET_PRODUCT) | sed -e 's/_1.*//
 obj-y        += silead_optical_fp/
 endif
 endif
+
+subdir-ccflags-y += -DCONFIG_OPPO_FINGERPRINT_PROJCT=18621
