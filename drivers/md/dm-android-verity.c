@@ -746,6 +746,7 @@ static int android_verity_ctr(struct dm_target *ti, unsigned argc, char **argv)
 
 	err = extract_metadata(dev, &fec, &metadata, &verity_enabled);
 
+
 	if (err) {
 		/* Allow invalid metadata when the device is unlocked */
 		if (is_unlocked()) {

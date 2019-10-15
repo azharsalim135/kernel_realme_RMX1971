@@ -1275,6 +1275,7 @@ static int spi_init_queue(struct spi_master *master)
 	 * request and the scheduling of the message pump thread. Without this
 	 * setting the message pump thread will remain at default priority.
 	 */
+	master->rt = 1;
 	if (master->rt) {
 		dev_info(&master->dev,
 			"will run message pump with realtime priority\n");

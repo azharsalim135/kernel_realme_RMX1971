@@ -164,7 +164,15 @@ int nf_queue(struct sk_buff *skb, struct nf_hook_state *state,
 	int ret;
 
 	RCU_INIT_POINTER(state->hook_entries, entry);
+
+#ifdef VENDOR_EDIT
+//Junyuan.Huang@PSW.CN.WiFi.Network.1471780, 2018/06/26,
+//Add for limit speed function
+	ret = __nf_queue(skb, state, verdict);
+#else /* VENDOR_EDIT */
 	ret = __nf_queue(skb, state, verdict >> NF_VERDICT_QBITS);
+#endif /* VENDOR_EDIT */
+
 	if (ret < 0) {
 		if (ret == -ESRCH &&
 		    (verdict & NF_VERDICT_FLAG_QUEUE_BYPASS)) {

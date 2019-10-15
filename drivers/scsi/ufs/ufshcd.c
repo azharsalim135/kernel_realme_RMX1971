@@ -49,6 +49,10 @@
 #include "ufs-debugfs.h"
 #include "ufs-qcom.h"
 
+#ifdef VENDOR_EDIT
+//zhenjian Jiang@PSW.BSP.Storage.UFS, 2018-05-04 add for ufs device in /proc/devinfo 
+#include <soc/oppo/device_info.h>
+#endif
 #define CREATE_TRACE_POINTS
 #include <trace/events/ufs.h>
 
@@ -3491,6 +3495,7 @@ out_put_tag:
 	wake_up(&hba->dev_cmd.tag_wq);
 	if (has_read_lock)
 		up_read(&hba->lock);
+
 	return err;
 }
 
@@ -7563,7 +7568,12 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 	struct scsi_device *sdev_boot = NULL;
 	bool is_bootable_dev = false;
 	bool is_embedded_dev = false;
-
+#ifdef VENDOR_EDIT
+//yh@PSW.BSP.Storage.UFS, 2018-05-31 add for ufs device in /proc/devinfo
+	static char temp_version[5] = {0};
+	static char vendor[9] = {0};
+	static char model[17] = {0};
+#endif
 	if ((hba->dev_info.b_device_sub_class == UFS_DEV_EMBEDDED_BOOTABLE) ||
 	    (hba->dev_info.b_device_sub_class == UFS_DEV_REMOVABLE_BOOTABLE))
 		is_bootable_dev = true;
@@ -7582,6 +7592,14 @@ static int ufshcd_scsi_add_wlus(struct ufs_hba *hba)
 		goto out;
 	}
 	scsi_device_put(hba->sdev_ufs_device);
+#ifdef VENDOR_EDIT
+//yh@PSW.BSP.Storage.UFS, 2018-05-31 add for ufs device in /proc/devinfo
+	strncpy(temp_version, hba->sdev_ufs_device->rev, 4);
+	strncpy(vendor, hba->sdev_ufs_device->vendor, 8);
+	strncpy(model, hba->sdev_ufs_device->model, 16);
+	register_device_proc("ufs_version", temp_version, vendor);
+	register_device_proc("ufs", model, vendor);
+#endif
 
 	if (is_bootable_dev) {
 		sdev_boot = __scsi_add_device(hba->host, 0, 0,
@@ -8103,16 +8121,9 @@ out:
 	/*
 	 * If we failed to initialize the device or the device is not
 	 * present, turn off the power/clocks etc.
-	 * In cases when there's both ufs and emmc present and regualtors
-	 * are shared b/w the two, this shouldn't turn-off the regulators
-	 * w/o giving emmc a chance to send PON.
-	 * Hence schedule a delayed suspend, thus giving enough time to
-	 * emmc to vote for the shared regulator.
 	 */
-	if (ret && !ufshcd_eh_in_progress(hba) && !hba->pm_op_in_progress) {
-		pm_runtime_put_noidle(hba->dev);
-		pm_schedule_suspend(hba->dev, MSEC_PER_SEC * 10);
-	}
+	if (ret && !ufshcd_eh_in_progress(hba) && !hba->pm_op_in_progress)
+		pm_runtime_put_sync(hba->dev);
 
 	trace_ufshcd_init(dev_name(hba->dev), ret,
 		ktime_to_us(ktime_sub(ktime_get(), start)),

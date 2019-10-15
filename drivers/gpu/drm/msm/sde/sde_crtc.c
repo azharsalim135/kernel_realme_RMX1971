@@ -39,6 +39,7 @@
 #include "sde_core_perf.h"
 #include "sde_trace.h"
 
+
 #define SDE_PSTATES_MAX (SDE_STAGE_MAX * 4)
 #define SDE_MULTIRECT_PLANE_MAX (SDE_STAGE_MAX * 2)
 
@@ -2475,6 +2476,7 @@ void sde_crtc_complete_commit(struct drm_crtc *crtc,
 	SDE_EVT32_VERBOSE(DRMID(crtc));
 
 	sde_core_perf_crtc_update(crtc, 0, false);
+
 }
 
 /**
@@ -2577,6 +2579,7 @@ static void _sde_crtc_set_dim_layer_v1(struct sde_crtc_state *cstate,
 				dim_layer[i].color_fill.color_3);
 	}
 }
+
 
 /**
  * _sde_crtc_set_dest_scaler - copy dest scaler settings from userspace
@@ -4575,6 +4578,7 @@ static int _sde_crtc_check_secure_state(struct drm_crtc *crtc,
 	return 0;
 }
 
+
 static int sde_crtc_atomic_check(struct drm_crtc *crtc,
 		struct drm_crtc_state *state)
 {
@@ -4724,6 +4728,7 @@ static int sde_crtc_atomic_check(struct drm_crtc *crtc,
 			sde_plane_clear_multirect(pipe_staged[i]);
 		}
 	}
+
 
 	/* assign mixer stages based on sorted zpos property */
 	sort(pstates, cnt, sizeof(pstates[0]), pstate_cmp, NULL);

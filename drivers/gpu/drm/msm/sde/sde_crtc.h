@@ -427,6 +427,7 @@ struct sde_crtc_state {
 	bool sbuf_clk_shifted;
 
 	struct sde_crtc_respool rp;
+
 };
 
 enum sde_crtc_irq_state {

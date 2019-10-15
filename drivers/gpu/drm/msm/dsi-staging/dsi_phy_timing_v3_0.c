@@ -17,7 +17,9 @@
 void dsi_phy_hw_v3_0_get_default_phy_params(
 		struct phy_clk_params *params)
 {
-	params->clk_prep_buf = 0;
+#ifndef VENDOR_EDIT
+//caiwutang@MM.Display.LCD.Featrue,Modify for mipi prepare and zero time
+        params->clk_prep_buf = 0;
 	params->clk_zero_buf = 0;
 	params->clk_trail_buf = 0;
 	params->hs_prep_buf = 0;
@@ -25,6 +27,16 @@ void dsi_phy_hw_v3_0_get_default_phy_params(
 	params->hs_trail_buf = 0;
 	params->hs_rqst_buf = 0;
 	params->hs_exit_buf = 0;
+#else /* VENDOR_EDIT */
+        params->clk_prep_buf = 5;
+	params->clk_zero_buf = 2;
+	params->clk_trail_buf = 0;
+	params->hs_prep_buf = 5;
+	params->hs_zero_buf = 2;
+	params->hs_trail_buf = 0;
+	params->hs_rqst_buf = 0;
+	params->hs_exit_buf = 0;
+#endif /* VENDOR_EDIT */
 }
 
 int32_t dsi_phy_hw_v3_0_calc_clk_zero(s64 rec_temp1, s64 mult)
@@ -92,8 +104,14 @@ void dsi_phy_hw_v3_0_update_timing_params(
 	timing->lane_v3[6] = desc->hs_prepare.reg_value;
 	timing->lane_v3[7] = desc->hs_trail.reg_value;
 	timing->lane_v3[8] = desc->hs_rqst.reg_value;
+#ifdef VENDOR_EDIT
+/*liping-m@PSW.MM.Display.Lcd.Stability, 2018-12-04,add for solve esd fail phy error:0x1000820*/
+	timing->lane_v3[9] = 0x04;
+	timing->lane_v3[10] = 0x05;
+#else
 	timing->lane_v3[9] = 0x02;
 	timing->lane_v3[10] = 0x04;
+#endif /*VENDOR_EDIT*/
 	timing->lane_v3[11] = 0x00;
 
 	pr_debug("[%d %d %d %d]\n", timing->lane_v3[0],

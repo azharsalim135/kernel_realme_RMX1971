@@ -796,65 +796,7 @@ err_invalid_fw:
 
 int pil_mss_debug_reset(struct pil_desc *pil)
 {
-	struct q6v5_data *drv = container_of(pil, struct q6v5_data, desc);
-	u32 encryption_status;
-	int ret;
-
-
-	if (!pil->minidump_ss)
-		return 0;
-
-	encryption_status = pil->minidump_ss->encryption_status;
-
-	if ((pil->minidump_ss->md_ss_enable_status != MD_SS_ENABLED) ||
-		encryption_status == MD_SS_ENCR_NOTREQ)
-		return 0;
-
-	/*
-	 * Bring subsystem out of reset and enable required
-	 * regulators and clocks.
-	 */
-	ret = pil_mss_enable_clks(drv);
-	if (ret)
-		return ret;
-
-	if (pil->minidump_ss) {
-		writel_relaxed(0x1, drv->reg_base + QDSP6SS_NMI_CFG);
-		/* Let write complete before proceeding */
-		mb();
-		udelay(2);
-	}
-	/* Assert reset to subsystem */
-	pil_mss_restart_reg(drv, true);
-	/* Wait 6 32kHz sleep cycles for reset */
-	udelay(200);
-	ret =  pil_mss_restart_reg(drv, false);
-	if (ret)
-		goto err_restart;
-	/* Let write complete before proceeding */
-	mb();
-	udelay(200);
-	ret = pil_q6v5_reset(pil);
-	/*
-	 * Need to Wait for timeout for debug reset sequence to
-	 * complete before returning
-	 */
-	pr_info("Minidump: waiting encryption to complete\n");
-	msleep(13000);
-	if (pil->minidump_ss) {
-		writel_relaxed(0x2, drv->reg_base + QDSP6SS_NMI_CFG);
-		/* Let write complete before proceeding */
-		mb();
-		udelay(200);
-	}
-	if (ret)
-		goto err_restart;
 	return 0;
-err_restart:
-	pil_mss_disable_clks(drv);
-	if (drv->ahb_clk_vote)
-		clk_disable_unprepare(drv->ahb_clk);
-	return ret;
 }
 
 static int pil_msa_auth_modem_mdt(struct pil_desc *pil, const u8 *metadata,

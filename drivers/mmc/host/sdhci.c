@@ -78,8 +78,23 @@ static void sdhci_dump_state(struct sdhci_host *host)
 		mmc->parent->power.disable_depth);
 }
 
+#ifdef VENDOR_EDIT 
+//yixue.ge@BSP.drv 2014-06-04 modify for disable sdcard log
+#ifndef CONFIG_OPPO_DAILY_BUILD
+static int flag = 0;
+#endif
+#endif
 static void sdhci_dumpregs(struct sdhci_host *host)
 {
+#ifdef VENDOR_EDIT 
+//yixue.ge@BSP.drv 2014-06-04 modify for disable sdcard log
+#ifndef CONFIG_OPPO_DAILY_BUILD
+	if(!flag)
+		flag++;
+	else
+		return;
+#endif
+#endif
 	MMC_TRACE(host->mmc,
 		"%s: 0x04=0x%08x 0x06=0x%08x 0x0E=0x%08x 0x30=0x%08x 0x34=0x%08x 0x38=0x%08x\n",
 		__func__,
@@ -1223,6 +1238,17 @@ void sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 	unsigned long timeout;
 
 	WARN_ON(host->cmd);
+
+#ifdef VENDOR_EDIT
+//yh@bsp, 2015-10-21 Add for special card compatible
+        if(host->mmc->card_stuck_in_programing_status && ((cmd->opcode == MMC_WRITE_MULTIPLE_BLOCK) || (cmd->opcode == MMC_WRITE_BLOCK)))
+        {
+                pr_info("blocked write cmd:%s\n", mmc_hostname(host->mmc));
+                cmd->error = -EIO;
+                tasklet_schedule(&host->finish_tasklet);
+                return;
+        }
+#endif /* VENDOR_EDIT */
 
 	/* Initially, a command has no error */
 	cmd->error = 0;

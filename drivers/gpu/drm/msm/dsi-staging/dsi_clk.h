@@ -260,14 +260,24 @@ void *dsi_register_clk_handle(void *clk_mngr, char *client);
  */
 int dsi_deregister_clk_handle(void *client);
 
+#ifdef VENDOR_EDIT
+/*LiPing-M@PSW.MM.Display.LCD.Stable,2019-1-28 add for panel mipi clk */
+/**
+ * dsi_display_link_clk_force_update() - force to set link clks
+ * @handle:     Handle of desired DSI clock client.
+ *
+ * return: error code in case of failure or 0 for success.
+ */
+int dsi_display_link_clk_force_update(void *handle);
+#else  /*VENDOR_EDIT*/
 /**
  * dsi_display_link_clk_force_update_ctrl() - force to set link clks
  * @handle:     Handle of desired DSI clock client.
  *
  * return: error code in case of failure or 0 for success.
  */
-
 int dsi_display_link_clk_force_update_ctrl(void *handle);
+#endif /*VENDOR_EDIT*/
 
 /**
  * dsi_display_clk_ctrl() - set frequencies for link clks
@@ -331,4 +341,18 @@ int dsi_clk_prepare_enable(struct dsi_clk_link_set *clk);
  * @clk:       list of src clocks.
  */
 void dsi_clk_disable_unprepare(struct dsi_clk_link_set *clk);
+
+#ifdef VENDOR_EDIT
+/*LiPing-M@PSW.MM.Display.LCD.Stable,2019-1-28 add for panel mipi clk */
+
+/**
+ * dsi_clk_req_state() - request to change dsi clock state
+ * @client:       DSI clocl client pointer.
+ * @clk:          DSI clock list.
+ * @state:        Requested state of the clock.
+ */
+int dsi_clk_req_state(void *client, enum dsi_clk_type clk,
+	enum dsi_clk_state state);
+
+#endif /*VENDOR_EDIT*/
 #endif /* _DSI_CLK_H_ */

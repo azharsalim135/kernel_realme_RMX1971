@@ -2356,6 +2356,7 @@ static int diag_ioctl_query_pd_logging(struct diag_logging_mode_param_t *param)
 	return ret;
 }
 
+
 static int diag_ioctl_register_callback(unsigned long ioarg)
 {
 	int err = 0;
@@ -2614,7 +2615,7 @@ long diagchar_ioctl(struct file *filp,
 	uint16_t remote_dev;
 	struct diag_dci_client_tbl *dci_client = NULL;
 	struct diag_logging_mode_param_t mode_param;
-
+	
 	switch (iocmd) {
 	case DIAG_IOCTL_COMMAND_REG:
 		result = diag_ioctl_cmd_reg(ioarg);
@@ -2732,6 +2733,7 @@ long diagchar_ioctl(struct file *filp,
 			return -EFAULT;
 		result = diag_ioctl_query_pd_logging(&mode_param);
 		break;
+
 	}
 	return result;
 }
