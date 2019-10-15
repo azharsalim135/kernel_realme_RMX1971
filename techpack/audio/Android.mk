@@ -1,7 +1,7 @@
 # Android makefile for audio kernel modules
 MY_LOCAL_PATH := $(call my-dir)
 
-UAPI_OUT := $(PRODUCT_OUT)/obj/vendor/qcom/opensource/audio-kernel/include
+UAPI_OUT := $(PRODUCT_OUT)/obj/kernel/msm-4.9/opensource/audio-kernel/include
 
 ifeq ($(call is-board-platform-in-list,msm8909 msm8953 msm8937 sdm845 sdm710 qcs605),true)
 $(shell mkdir -p $(UAPI_OUT)/linux;)
@@ -35,3 +35,6 @@ $(shell rm -rf $(PRODUCT_OUT)/obj/vendor/qcom/opensource/audio-kernel/asoc/codec
 include $(MY_LOCAL_PATH)/asoc/codecs/sdm660_cdc/Android.mk
 include $(MY_LOCAL_PATH)/asoc/codecs/msm_sdw/Android.mk
 endif
+
+include $(MY_LOCAL_PATH)/asoc/codecs/tfa98xx/Android.mk
+
